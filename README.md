@@ -86,9 +86,3 @@ config := &Config{
 
 ## Future Improvements
 - Add support for weighted round-robin or other load balancing algorithms.
-- Implement configuration via environment variables or a config file.
-- Add metrics for monitoring server health and request distribution.
-- Support graceful shutdown and dynamic server addition/removal.
-
-## License
-This project is licensed under the MIT License.
