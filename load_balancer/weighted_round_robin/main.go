@@ -1,0 +1,69 @@
+package main
+
+import (
+	"log"
+	"net/http"
+	"net/url"
+	"time"
+)
+
+type Config struct{
+	port string
+	healthCheckInterval string
+	servers_url []string
+	weight []int
+}
+
+
+func main(){
+	config := &Config{
+		port: ":4000",
+		healthCheckInterval: "2s",
+		servers_url: []string{
+			"http://localhost:8001",
+			"http://localhost:8002",
+			"http://localhost:8003",
+			"http://localhost:8004",
+		},
+		weight: []int{
+			3,1,2,1,
+		},
+	}
+
+	var servers []*WeightedServer
+	interval, err := time.ParseDuration(config.healthCheckInterval)
+	if err != nil {
+		log.Printf("Error parsing health check interval: %v", err)
+	}
+	for i, serverUrl := range config.servers_url{
+		parsedUrl, err := url.Parse(serverUrl)
+		
+		if err != nil {
+			log.Printf("Error parsing server url: %v", err)
+		}
+		server := NewWeightedServer(parsedUrl, true, config.weight[i]); // server -> urls, heathCheck , mu
+		servers = append(servers, server);
+		go HealthCheck(server, interval)
+	}
+	
+	lb := NewLoadBalancer(0);
+	go StartHealthChecks(servers, interval)
+
+	http.HandleFunc("/", func(rw http.ResponseWriter,r *http.Request){
+		forwardedServer := lb.GetNextServerByWeightedRoundRobin(servers); 
+		if forwardedServer == nil {
+			http.Error(rw, "Healthy server not available", http.StatusServiceUnavailable)
+			return
+		}
+
+		forwardedServer.ReverseProxy().ServeHTTP(rw, r)
+		rw.Header().Add("X-Forwarded-Server", forwardedServer.URL.String());
+	})
+
+
+	log.Printf("load balancer server starting on port %v", config.port)
+	if err := http.ListenAndServe(config.port, nil); err != nil{
+		log.Fatalf("Error starting load balancer: %s\n", err.Error())
+	}
+
+}

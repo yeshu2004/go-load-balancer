@@ -1,4 +1,4 @@
-package load_balancer
+package main
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 )
+
 
 func StartHealthChecks(servers []*Server, interval time.Duration) {
     ticker := time.NewTicker(interval)
@@ -29,7 +30,7 @@ func checkServerHealth(server *Server){
     server.isHealthy = err == nil && resp.StatusCode == http.StatusOK
 }
 
-func HeathCheck(server *Server, healthCheckInterval time.Duration){
+func HealthCheck(server *Server, healthCheckInterval time.Duration){
 	for range time.Tick(healthCheckInterval){
 		res , err := http.Head(server.URL.String())
 

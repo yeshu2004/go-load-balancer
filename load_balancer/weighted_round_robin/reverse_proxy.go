@@ -1,9 +1,9 @@
-package load_balancer
+package main
 
 import (
 	"net/http/httputil"
 )
 
-func (s *Server) ReverseProxy() *httputil.ReverseProxy{
+func (s *WeightedServer) ReverseProxy() *httputil.ReverseProxy{
 	return httputil.NewSingleHostReverseProxy(s.URL);
 }

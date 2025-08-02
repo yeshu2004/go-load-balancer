@@ -1,4 +1,4 @@
-package load_balancer
+package main
 
 import (
 	"net/url"
@@ -15,6 +15,7 @@ type Server struct {
 	isHealthy bool
 	mu        sync.Mutex
 }
+
 
 func NewServer(url *url.URL, isHealthy bool) *Server {
 	return &Server{URL: url, isHealthy: isHealthy}

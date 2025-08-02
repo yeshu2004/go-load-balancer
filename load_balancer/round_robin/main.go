@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"go-load-balancer/load_balancer"
+
 	"time"
 )
 
@@ -27,7 +27,7 @@ func main(){
 		},
 	}
 
-	var servers []*load_balancer.Server
+	var servers []*Server
 	interval, err := time.ParseDuration(config.healthCheckInterval)
 	if err != nil {
 		log.Printf("Error parsing health check interval: %v", err)
@@ -37,14 +37,13 @@ func main(){
 		if err != nil {
 			log.Printf("Error parsing server url: %v", err)
 		}
-		server := load_balancer.NewServer(parsedUrl, true); // server -> urls, heathCheck , mu
+		server := NewServer(parsedUrl, true); // server -> urls, heathCheck , mu
 		servers = append(servers, server);
-
-		go load_balancer.HeathCheck(server, interval)
+		go HealthCheck(server, interval)
 	}
 	
-	lb := load_balancer.NewLoadBalancer(0);
-	go load_balancer.StartHealthChecks(servers, interval)
+	lb := NewLoadBalancer(0);
+	go StartHealthChecks(servers, interval)
 
 	http.HandleFunc("/", func(rw http.ResponseWriter,r *http.Request){
 		forwardedServer := lb.GetNextServerByRoundRobin(servers); 
