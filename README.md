@@ -14,7 +14,6 @@ This project implements a simple load balancer in Go that distributes incoming H
 - `load_balancer/heath_check.go`: Implements health checking logic for backend servers.
 - `load_balancer/reverse_proxy.go`: Configures the reverse proxy for forwarding requests.
 - `load_balancer/round_robin.go`: Implements the round-robin algorithm and server management.
-- `mock_server/main.go`: A simple mock server for testing the load balancer.
 
 ## Prerequisites
 - Go 1.16 or higher
@@ -23,7 +22,7 @@ This project implements a simple load balancer in Go that distributes incoming H
 ## Setup
 1. **Clone the Repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/yeshu2004/go-load-balancer
    cd go-load-balancer
    ```
 
@@ -31,11 +30,7 @@ This project implements a simple load balancer in Go that distributes incoming H
    No external dependencies are required beyond the Go standard library.
 
 3. **Run Mock Servers**:
-   Start mock servers to simulate backend services. Open separate terminals and run:
-   ```bash
-   go run mock_server/main.go
-   ```
-   By default, it runs on port `:8001`. Modify the port in the code to start additional servers on `:8002`, `:8003`, etc.
+   Start mock servers to simulate backend services. Open separate terminals and run the all mock server i.e `http://localhost:8001`, `http://localhost:8002`, `http://localhost:8003`, `http://localhost:80024`
 
 4. **Run the Load Balancer**:
    ```bash
@@ -86,9 +81,3 @@ config := &Config{
 
 ## Future Improvements
 - Add support for weighted round-robin or other load balancing algorithms.
-- Implement configuration via environment variables or a config file.
-- Add metrics for monitoring server health and request distribution.
-- Support graceful shutdown and dynamic server addition/removal.
-
-## License
-This project is licensed under the MIT License.
