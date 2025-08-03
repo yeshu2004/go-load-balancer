@@ -8,6 +8,13 @@ import (
 )
 
 
+func (s *Server) IsHealthy() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.isHealthy
+}
+
+
 func StartHealthChecks(servers []*Server, interval time.Duration) {
     ticker := time.NewTicker(interval)
     go func() {

@@ -13,7 +13,7 @@ type LoadBalancer struct {
 type Server struct {
 	URL       *url.URL
 	isHealthy bool
-	mu        sync.Mutex
+	mu        sync.RWMutex
 }
 
 
@@ -28,21 +28,24 @@ func NewLoadBalancer(count int) *LoadBalancer {
 
 func (lb *LoadBalancer) GetNextServerByRoundRobin(servers []*Server) *Server {
 	lb.mu.Lock()
-	defer lb.mu.Unlock()
+    index := lb.count % len(servers)
+    lb.count = (lb.count + 1) % len(servers) 
+    candidateServer := servers[index]
+    lb.mu.Unlock() 
 
-	for i := 0; i < len(servers); i++ {
-		index := lb.count % len(servers)
-		nextServer := servers[index] // server selected
-		lb.count++
+    if candidateServer.IsHealthy() {
+        return candidateServer
+    }
 
-		// check if server is healthy or not!
-		nextServer.mu.Lock()
-		isHealthy := nextServer.isHealthy
-		if isHealthy {
-			return nextServer
-		}
-		defer nextServer.mu.Unlock()
+    for i := 0; i < len(servers)-1; i++ {
+        lb.mu.Lock()
+        index = (index + 1) % len(servers)
+        candidateServer = servers[index]
+        lb.mu.Unlock()
 
-	}
-	return nil
+        if candidateServer.IsHealthy() {
+            return candidateServer
+        }
+    }
+    return nil  // No healthy servers
 }
