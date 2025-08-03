@@ -1,4 +1,4 @@
-# Load Balancer and API Server Project
+# Load Balancer with Sticky Session
 
 This repository contains Go-based round-robin and weighted round-robin load balancers that distribute HTTP requests across backend API servers (`server_one` to `server_four`). The **round-robin load balancer** features **sticky session** support using Redis to ensure requests from the same client are routed to the same backend server.
 
